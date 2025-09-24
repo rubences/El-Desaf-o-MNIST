@@ -1,12 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World</title>
-  </head>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Desafío MNIST</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2em; background-color: #f9f9f9; color: #333; }
+        h1, h2 { color: #1a1a1a; }
+        pre { background-color: #eee; padding: 1.5em; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; }
+        .container { max-width: 960px; margin: 0 auto; background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .graphs img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resultados del Desafío MNIST</h1>
+        
+        <h2>Resumen del Modelo</h2>
+        <pre>{{ model_summary }}</pre>
 
-  <body>
-    <h1>Hello World</h1>
-  </body>
+        <h2>Fases del Entrenamiento (Logs)</h2>
+        <pre>{% for log in training_logs %}{{ log }}\n{% endfor %}</pre>
+
+        <h2>Evaluación Final</h2>
+        <p><strong>{{ final_accuracy }}</strong></p>
+
+        <h2>Gráficos de Resultados</h2>
+        <div class="graphs">
+            <img src="/static/accuracy.png" alt="Gráfico de Precisión">
+            <img src="/static/loss.png" alt="Gráfico de Pérdida">
+        </div>
+    </div>
+</body>
 </html>
