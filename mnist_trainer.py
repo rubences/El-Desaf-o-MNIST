@@ -41,6 +41,9 @@ def train_and_evaluate(num_epochs=5):
     training_logger = TrainingLogger()
     history = model.fit(x_train, y_train, epochs=num_epochs, batch_size=128, validation_split=0.1, callbacks=[training_logger], verbose=0)
 
+    # 3.5. Guardar el modelo entrenado
+    model.save('mnist_model.h5')
+
     # 4. Evaluación y predicción
     test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
     final_accuracy = f'Precisión final en el conjunto de prueba: {test_acc*100:.2f}%'
