@@ -1,7 +1,6 @@
 import os
 import json
 from flask import Flask, render_template
-from mnist_trainer import train_and_evaluate
 
 app = Flask(__name__, template_folder='src')
 
@@ -12,16 +11,18 @@ def tojson_safe_filter(obj):
 
 @app.route("/")
 def index():
-    # Obtenemos todos los datos visuales del entrenador
-    model_summary, training_logs, final_accuracy, graphs_json, sample_images = train_and_evaluate()
+    # --- CARGA RÁPIDA DESDE CACHÉ ---
+    # Ya no se entrena. Solo se leen los resultados pre-calculados.
+    with open('src/training_cache.json', 'r') as f:
+        cached_results = json.load(f)
     
-    # Pasamos todo a la plantilla
+    # Pasamos los datos cacheados a la plantilla
     return render_template('index.html', 
-                           model_summary=model_summary, 
-                           training_logs=training_logs, 
-                           final_accuracy=final_accuracy,
-                           graphs_json=graphs_json,
-                           sample_images=sample_images)
+                           model_summary=cached_results['model_summary'], 
+                           training_logs=cached_results['training_logs'], 
+                           final_accuracy=cached_results['final_accuracy'],
+                           graphs_json=cached_results['graphs_json'],
+                           sample_images=cached_results['sample_images'])
 
 def main():
     app.run(port=int(os.environ.get('PORT', 80)))
