@@ -10,6 +10,9 @@ from plotly.utils import PlotlyJSONEncoder
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 
+# --- PARÁMETRO DE OPTIMIZACIÓN ---
+NUM_EPOCHS = 5
+
 def train_and_evaluate():
     # 1. Carga y preparación de datos
     (x_train_raw, y_train_raw), (x_test_raw, y_test_raw) = keras.datasets.mnist.load_data()
@@ -31,7 +34,7 @@ def train_and_evaluate():
         model.summary()
     model_summary = f.getvalue()
 
-    # 3. Entrenamiento
+    # 3. Entrenamiento (con épocas reducidas)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     class TrainingLogger(keras.callbacks.Callback):
         def __init__(self):
@@ -39,7 +42,7 @@ def train_and_evaluate():
         def on_epoch_end(self, epoch, logs=None):
             self.logs.append(f"Epoch {epoch+1}/{self.params['epochs']} - loss: {logs['loss']:.4f} - acc: {logs['accuracy']:.4f} - val_loss: {logs['val_loss']:.4f} - val_acc: {logs['val_accuracy']:.4f}")
     training_logger = TrainingLogger()
-    history = model.fit(x_train, y_train, epochs=20, batch_size=128, validation_split=0.1, callbacks=[training_logger], verbose=0)
+    history = model.fit(x_train, y_train, epochs=NUM_EPOCHS, batch_size=128, validation_split=0.1, callbacks=[training_logger], verbose=0)
 
     # 4. Evaluación y predicción
     test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
@@ -49,7 +52,7 @@ def train_and_evaluate():
     true_labels = y_test_raw
 
     # 5. Generación de gráficos Plotly
-    epochs = list(range(1, 21))
+    epochs = list(range(1, NUM_EPOCHS + 1))
     fig_acc = go.Figure([
         go.Scatter(x=epochs, y=history.history['accuracy'], name='Precisión (Train)', mode='lines+markers'),
         go.Scatter(x=epochs, y=history.history['val_accuracy'], name='Precisión (Val)', mode='lines+markers')
