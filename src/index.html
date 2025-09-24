@@ -3,33 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados del Desafío MNIST</title>
+    <title>Análisis de Entrenamiento | MNIST</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2em; background-color: #f9f9f9; color: #333; }
-        h1, h2 { color: #1a1a1a; }
-        pre { background-color: #eee; padding: 1.5em; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; }
-        .container { max-width: 960px; margin: 0 auto; background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .graphs img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; margin-top: 1em; }
+        :root {
+            --background-color: #f6f6f6;
+            --card-background: #ffffff;
+            --text-color: #242424;
+            --header-color: #000000;
+            --border-color: #e1e1e1;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body { 
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 2rem auto; 
+            padding: 0 2rem;
+        }
+        .card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: var(--header-color);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; margin-top: 1.5rem; }
+        p, li { 
+            line-height: 1.6;
+            color: #454545;
+        }
+        pre { 
+            background-color: #f0f0f0;
+            padding: 1rem;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+        strong { font-weight: 600; }
+        .plotly-graph-div { margin: 1rem 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Resultados del Desafío MNIST</h1>
-        
-        <h2>Resumen del Modelo</h2>
-        <pre>{{ model_summary }}</pre>
+        <header class="card">
+            <h1>Análisis del Entrenamiento de una Red Neuronal para MNIST</h1>
+            <p>Este es un análisis interactivo del proceso de entrenamiento de un modelo de Deep Learning para clasificar los dígitos escritos a mano del famoso dataset <strong>MNIST</strong>.</p>
+        </header>
 
-        <h2>Fases del Entrenamiento (Logs)</h2>
-        <pre>{% for log in training_logs %}{{ log }}\n{% endfor %}</pre>
+        <main>
+            <section class="card">
+                <h2>Introducción al Problema</h2>
+                <p>El dataset MNIST contiene 70,000 imágenes de dígitos (0-9). El desafío consiste en construir un modelo que pueda aprender las características visuales de cada dígito para predecir correctamente números que no ha visto antes. Esto presenta retos como la variabilidad en la caligrafía, la inclinación y el grosor del trazo.</p>
+            </section>
 
-        <h2>Evaluación Final</h2>
-        <p><strong>{{ final_accuracy }}</strong></p>
+            <section class="card">
+                <h2>Visualización de Datos del Entrenamiento</h2>
+                <p>Los siguientes gráficos muestran la evolución del modelo durante las 20 épocas de entrenamiento. Puedes interactuar con ellos: haz zoom, desplázate o pasa el ratón sobre los puntos para ver los valores exactos.</p>
+                <div id="accuracy-chart" class="plotly-graph-div"></div>
+                <div id="loss-chart" class="plotly-graph-div"></div>
+            </section>
+            
+            <section class="card">
+                <h2>Análisis y Conclusiones</h2>
+                <p>El análisis de los gráficos revela un fenómeno clave: el <strong>sobreajuste (overfitting)</strong>.</p>
+                <ul>
+                    <li><strong>Precisión:</strong> Mientras la precisión en los datos de entrenamiento se acerca al 100%, la de validación se estanca y no mejora en las últimas fases.</li>
+                    <li><strong>Pérdida:</strong> La pérdida de entrenamiento sigue bajando, pero la de validación comienza a subir. Esta divergencia es el signo inequívoco de que el modelo está memorizando el ruido de los datos de entrenamiento en lugar de generalizar los patrones.</li>
+                </ul>
+                <p>Un modelo sobreajustado no es fiable en producción, ya que su rendimiento con datos nuevos será pobre. Este análisis demuestra la importancia de monitorizar el entrenamiento para detectar y mitigar el sobreajuste.</p>
+                 <p><strong>{{ final_accuracy }}</strong></p>
+            </section>
 
-        <h2>Gráficos de Resultados</h2>
-        <div class="graphs">
-            <img src="/static/accuracy.png" alt="Gráfico de Precisión">
-            <img src="/static/loss.png" alt="Gráfico de Pérdida">
-        </div>
+            <section class="card">
+                <h2>Detalles del Modelo y Logs</h2>
+                <h3>Resumen de la Arquitectura</h3>
+                <pre>{{ model_summary }}</pre>
+                <h3>Logs de Entrenamiento por Época</h3>
+                <pre>{% for log in training_logs %}{{ log }}\n{% endfor %}</pre>
+            </section>
+        </main>
     </div>
+
+    <script>
+        const graphs = {{ graphs_json | safe }};
+        Plotly.newPlot('accuracy-chart', graphs.accuracy.data, graphs.accuracy.layout);
+        Plotly.newPlot('loss-chart', graphs.loss.data, graphs.loss.layout);
+    </script>
 </body>
 </html>

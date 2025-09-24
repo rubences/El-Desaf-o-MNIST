@@ -1,9 +1,5 @@
-# Dev environment
-pip
-autopep8
-
-# App
-flask
-tensorflow
-numpy
-matplotlib
+Flask==3.0.3
+numpy==1.26.4
+tensorflow==2.16.2
+matplotlib==3.9.0
+plotly==5.22.0
