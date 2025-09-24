@@ -1,3 +1,4 @@
+bash devserver.sh
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,104 +8,92 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         :root {
-            --background-color: #f6f6f6;
+            --background-color: #f7f7f7;
             --card-background: #ffffff;
-            --text-color: #242424;
-            --header-color: #000000;
-            --border-color: #e1e1e1;
+            --text-color: #333;
+            --header-color: #111;
+            --border-color: #e8e8e8;
+            --accent-color-success: #28a745;
+            --accent-color-danger: #dc3545;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        body { 
-            font-family: var(--font-family);
-            margin: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        .container { 
-            max-width: 900px; 
-            margin: 2rem auto; 
-            padding: 0 2rem;
-        }
-        .card {
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        h1, h2 {
-            color: var(--header-color);
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-top: 0;
-        }
-        h1 { font-size: 2rem; }
-        h2 { font-size: 1.5rem; margin-top: 1.5rem; }
-        p, li { 
-            line-height: 1.6;
-            color: #454545;
-        }
-        pre { 
-            background-color: #f0f0f0;
-            padding: 1rem;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: "SF Mono", "Fira Code", monospace;
-            font-size: 0.9rem;
-            border: 1px solid var(--border-color);
-        }
-        strong { font-weight: 600; }
-        .plotly-graph-div { margin: 1rem 0; }
+        body { font-family: var(--font-family); margin: 0; background-color: var(--background-color); color: var(--text-color); }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+        .card { background: var(--card-background); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+        h1, h2, h3 { color: var(--header-color); font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin: 0 0 1rem 0; }
+        h1 { font-size: 2.2rem; }
+        h2 { font-size: 1.8rem; margin-top: 1rem; }
+        h3 { font-size: 1.2rem; border: none; }
+        p, li { line-height: 1.7; color: #555; }
+        pre { background-color: #f0f0f0; padding: 1rem; border-radius: 8px; white-space: pre-wrap; font-family: "SF Mono", monospace; font-size: 0.9rem; }
+        .final-accuracy { background-color: #e6f7ff; border-left: 5px solid #007aff; padding: 1rem 1.5rem; font-size: 1.2rem; font-weight: 500; margin: 1.5rem 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1.5rem; }
+        .sample-item { text-align: center; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+        .sample-item img { width: 100%; max-width: 80px; border-radius: 4px; }
+        .prediction-label { font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; }
+        .prediction-correct { color: var(--accent-color-success); }
+        .prediction-incorrect { color: var(--accent-color-danger); }
+        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="card">
-            <h1>Análisis del Entrenamiento de una Red Neuronal para MNIST</h1>
-            <p>Este es un análisis interactivo del proceso de entrenamiento de un modelo de Deep Learning para clasificar los dígitos escritos a mano del famoso dataset <strong>MNIST</strong>.</p>
+            <h1>Análisis Visual del Desafío MNIST</h1>
+            <p>Esta página presenta un análisis detallado del entrenamiento de un modelo de red neuronal para el reconocimiento de dígitos escritos a mano. El objetivo es proporcionar una visión clara y visual del rendimiento del modelo, sus limitaciones y los resultados obtenidos.</p>
         </header>
 
         <main>
             <section class="card">
-                <h2>Introducción al Problema</h2>
-                <p>El dataset MNIST contiene 70,000 imágenes de dígitos (0-9). El desafío consiste en construir un modelo que pueda aprender las características visuales de cada dígito para predecir correctamente números que no ha visto antes. Esto presenta retos como la variabilidad en la caligrafía, la inclinación y el grosor del trazo.</p>
+                <h2>Rendimiento del Modelo: Precisión y Pérdida</h2>
+                <p>Las siguientes gráficas muestran la evolución del modelo durante el entrenamiento. La divergencia entre las métricas de entrenamiento y validación es un claro indicador de <strong>sobreajuste (overfitting)</strong>: el modelo memoriza los datos de entrenamiento pero pierde su capacidad de generalizar a datos nuevos.</p>
+                <div class="grid">
+                    <div id="accuracy-chart"></div>
+                    <div id="loss-chart"></div>
+                </div>
             </section>
 
             <section class="card">
-                <h2>Visualización de Datos del Entrenamiento</h2>
-                <p>Los siguientes gráficos muestran la evolución del modelo durante las 20 épocas de entrenamiento. Puedes interactuar con ellos: haz zoom, desplázate o pasa el ratón sobre los puntos para ver los valores exactos.</p>
-                <div id="accuracy-chart" class="plotly-graph-div"></div>
-                <div id="loss-chart" class="plotly-graph-div"></div>
-            </section>
-            
-            <section class="card">
-                <h2>Análisis y Conclusiones</h2>
-                <p>El análisis de los gráficos revela un fenómeno clave: el <strong>sobreajuste (overfitting)</strong>.</p>
-                <ul>
-                    <li><strong>Precisión:</strong> Mientras la precisión en los datos de entrenamiento se acerca al 100%, la de validación se estanca y no mejora en las últimas fases.</li>
-                    <li><strong>Pérdida:</strong> La pérdida de entrenamiento sigue bajando, pero la de validación comienza a subir. Esta divergencia es el signo inequívoco de que el modelo está memorizando el ruido de los datos de entrenamiento en lugar de generalizar los patrones.</li>
-                </ul>
-                <p>Un modelo sobreajustado no es fiable en producción, ya que su rendimiento con datos nuevos será pobre. Este análisis demuestra la importancia de monitorizar el entrenamiento para detectar y mitigar el sobreajuste.</p>
-                 <p><strong>{{ final_accuracy }}</strong></p>
+                <h2>Análisis de Errores: Matriz de Confusión</h2>
+                <p>La matriz de confusión es una herramienta poderosa para visualizar el rendimiento de un modelo de clasificación. La diagonal principal muestra los aciertos. Los valores fuera de la diagonal revelan los errores específicos, es decir, qué dígitos son confundidos entre sí (por ejemplo, confundir un 5 con un 3).</p>
+                <div id="confusion-matrix-chart"></div>
+                <p class="final-accuracy">{{ final_accuracy }}</p>
             </section>
 
             <section class="card">
-                <h2>Detalles del Modelo y Logs</h2>
-                <h3>Resumen de la Arquitectura</h3>
+                <h2>Ejemplos de Predicciones</h2>
+                <p>A continuación se muestra una selección de imágenes del conjunto de prueba con la predicción del modelo. Esto permite observar de forma concreta su comportamiento: los aciertos se marcan en verde y los errores en rojo.</p>
+                <div class="image-gallery">
+                    {% for sample in sample_images %}
+                    <div class="sample-item">
+                        <img src="{{ sample.image }}" alt="Dígito {{ sample.true_label }}">
+                        <div class="prediction-label {% if sample.predicted_label == sample.true_label %}prediction-correct{% else %}prediction-incorrect{% endif %}">
+                            Real: {{ sample.true_label }} | Predicción: {{ sample.predicted_label }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Detalles Técnicos</h2>
+                <h3>Arquitectura del Modelo</h3>
                 <pre>{{ model_summary }}</pre>
-                <h3>Logs de Entrenamiento por Época</h3>
+                <h3>Logs de Entrenamiento</h3>
                 <pre>{% for log in training_logs %}{{ log }}\n{% endfor %}</pre>
             </section>
         </main>
     </div>
 
     <script>
-        const graphs = {{ graphs_json | safe }};
-        Plotly.newPlot('accuracy-chart', graphs.accuracy.data, graphs.accuracy.layout);
-        Plotly.newPlot('loss-chart', graphs.loss.data, graphs.loss.layout);
+        // El backend pasa los datos como un string JSON, aquí lo parseamos
+        const graphsData = JSON.parse({{ graphs_json | tojson_safe }});
+        
+        // Renderizar los 3 gráficos
+        Plotly.newPlot('accuracy-chart', graphsData.accuracy.data, graphsData.accuracy.layout);
+        Plotly.newPlot('loss-chart', graphsData.loss.data, graphsData.loss.layout);
+        Plotly.newPlot('confusion-matrix-chart', graphsData.confusion_matrix.data, graphsData.confusion_matrix.layout);
     </script>
 </body>
 </html>
